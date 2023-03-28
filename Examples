@@ -1,0 +1,68 @@
+Shared Preferences Example :
+
+In MyCigna we are storing remember username 
+ 
+var storedUserName: String
+    get() = prefs.getString("StoredUser", "")!!
+    set(value) = prefs.edit().putString("StoredUser", value).apply()
+
+Similarly MyCignaSharedPreferences class having all shared preference information
+
+
+Biometric Example :
+
+val biometricPrompt = BiometricPrompt(activity,
+    Executors.newSingleThreadExecutor(),
+    object : BiometricPrompt.AuthenticationCallback() {
+        override fun onAuthenticationError(
+            errorCode: Int,
+            @NonNull errString: CharSequence,
+        ) {
+            super.onAuthenticationError(errorCode, errString)
+            Timber.d("Failure, error=$errorCode")
+
+            when (errorCode) {
+                BiometricPrompt.ERROR_USER_CANCELED, BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {
+                    callback.onFingerprintCancel()
+                }
+                BiometricPrompt.ERROR_NO_BIOMETRICS -> {
+                    callback.onFingerprintNoEnrolledError(errString.toString())
+                }
+                else -> {
+                    callback.onFingerprintError(errString.toString())
+                }
+            }
+        }
+
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            super.onAuthenticationSucceeded(result)
+            Timber.d("Success")
+
+            generateSecretKey()
+            callback.onFingerprintSuccess(null)
+        }
+    })
+
+Similarly BiometricHelper class having biometric information
+
+MFA Example :
+
+var hasStartedMfaSetup: Boolean
+    get() {
+        return cache["_has_started_mfa_setup_"] as Boolean? ?: false
+    }
+    set(n) {
+        cache["_has_started_mfa_setup_"] = n
+    }
+var hasCompletedMfaSetup: Boolean
+    get() {
+        return cache["_has_completed_mfa_setup_"] as Boolean? ?: false
+    }
+    set(n) {
+        cache["_has_completed_mfa_setup_"] = n
+    }
+
+
+Similarly SessionCache class having all MFA related information
+
+
